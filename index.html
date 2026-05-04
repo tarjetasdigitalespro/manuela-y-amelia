@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nuestros Quince Años - Manuela & Amelia</title>
+    
+    <style>
+        /* ========================
+           FUENTES LOCALES
+        ======================== */
+        @font-face {
+            font-family: 'BillionDreams';
+            src: url('./fuentes/BillionDreams_PERSONAL.woff2') format('woff2'),
+                 url('./fuentes/BillionDreams_PERSONAL.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'TimesNewNormal';
+            src: url('./fuentes/Times New Normal Regular.woff2') format('woff2'),
+                 url('./fuentes/Times New Normal Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        /* ========================
+           VARIABLES Y RESET
+        ======================== */
+        :root {
+            --color-gris-carta: #e8e8e8;
+            --color-blanco: #ffffff;
+            --color-rosado: #f8c8d8; /* Rosado pastel */
+            --color-verde-oliva: #AB9144;
+            --color-dorado: #c4a760;
+            --color-texto-oscuro: #555555;
+            --fuente-titulo: 'BillionDreams', cursive;
+            --fuente-texto: 'TimesNewNormal', serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            font-family: var(--fuente-texto);
+            background-color: #000; /* Fondo negro fuera del móvil */
+            overflow: hidden;
+            color: var(--color-blanco);
+        }
+
+        /* ========================
+           CONTENEDOR PRINCIPAL
+        ======================== */
+        #app-container {
+            width: 100%;
+            height: 100%;
+            max-width: 430px;
+            margin: 0 auto;
+            position: relative;
+            background-color: var(--color-blanco);
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+        }
+        
+        #app-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* ========================
+           ESTILOS COMUNES PANTALLAS
+        ======================== */
+        .screen {
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hidden-screen {
+            display: none !important;
+        }
+
+        .titulo-nombres {
+            font-family: var(--fuente-titulo);
+            font-size: 3.5rem;
+            line-height: 1.1;
+            text-align: center;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            margin: 15px 0;
+            z-index: 2;
+        }
+
+        .logo-15 {
+            width: 180px;
+            height: auto;
+            z-index: 2;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        /* ANIMACIONES INTERSECTION OBSERVER */
+        .anim-fade-in { opacity: 0; transition: opacity 1.2s ease-out; }
+        .anim-slide-up { opacity: 0; transform: translateY(50px); transition: opacity 1s ease-out, transform 1s ease-out; }
+        .anim-scale-in { opacity: 0; transform: scale(0.9); transition: opacity 1.2s ease-out, transform 1.2s ease-out; }
+        
+        .is-visible .anim-fade-in { opacity: 1; }
+        .is-visible .anim-slide-up { opacity: 1; transform: translateY(0); }
+        .is-visible .anim-scale-in { opacity: 1; transform: scale(1); }
+
+        /* Retrasos secuenciales */
+        .delay-1 { transition-delay: 0.3s; }
+        .delay-2 { transition-delay: 0.6s; }
+        .delay-3 { transition-delay: 0.9s; }
+        .delay-4 { transition-delay: 1.2s; }
+
+        /* ========================
+           PANTALLA 1: CARTA
+        ======================== */
+        #screen-1 {
+            background-color: var(--color-gris-carta);
+            z-index: 100;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E"),
+                linear-gradient(to bottom right, rgba(0,0,0,0.05) 49%, transparent 51%),
+                linear-gradient(to bottom left, rgba(0,0,0,0.05) 49%, transparent 51%);
+            background-size: 100px 100px, 50% 30%, 50% 30%;
+            background-position: top left, top left, top right;
+            background-repeat: repeat, no-repeat, no-repeat;
+            transition: transform 1.5s cubic-bezier(0.77, 0, 0.175, 1), opacity 1.5s ease;
+        }
+
+        #screen-1.carta-abierta {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .sello-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .sello-img {
+            width: 140px;
+            height: auto;
+            animation: pulsoSello 2.5s infinite ease-in-out;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.4));
+        }
+
+        .manito-img {
+            width: 50px;
+            position: absolute;
+            bottom: -15px;
+            right: -15px;
+            animation: toqueManito 1.5s infinite alternate ease-in-out, resplandorMagico 1.5s infinite alternate ease-in-out;
+        }
+
+        .texto-toca {
+            margin-top: 25px;
+            font-size: 1.2rem;
+            color: #555;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: fadeInOut 2s infinite;
+        }
+
+        .texto-toca span {
+            display: block;
+            font-size: 0.85rem;
+            text-transform: none;
+            letter-spacing: normal;
+            margin-top: 5px;
+        }
+
+        .particle {
+            position: fixed;
+            background-color: var(--color-dorado);
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none;
+            animation: flotarParticula linear infinite;
+            z-index: 1;
+        }
+
+        /* ========================
+           PANTALLA 2: PORTADA
+        ======================== */
+        #screen-2 {
+            background-color: #000;
+        }
+        
+        #video-fondo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background-color: #0d6efd; /* Azul que combina con el video */
+            z-index: 1;
+        }
+
+        .franja-dorada {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 45px;
+            background-color: var(--color-dorado);
+            z-index: 2;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+        }
+
+        #screen-2 .content {
+            position: absolute;
+            top: 15%;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ========================
+           PANTALLA 3: BIENVENIDA
+        ======================== */
+        #screen-3 {
+            background-color: var(--color-blanco);
+            color: var(--color-texto-oscuro);
+        }
+
+        #screen-3 .franja-dorada {
+            height: 25px;
+        }
+
+        .bienvenidos-texto {
+            font-size: 1.5rem;
+            font-style: italic;
+            margin-bottom: 10px;
+            color: var(--color-verde-oliva);
+        }
+
+        .texto-inferior {
+            font-size: 1rem;
+            font-style: italic;
+            text-align: center;
+            width: 80%;
+            margin-top: 30px;
+            color: var(--color-texto-oscuro);
+        }
+
+        #screen-3 .titulo-nombres {
+            color: var(--color-dorado);
+            text-shadow: none;
+        }
+
+        .contador {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .caja-contador {
+            background-color: var(--color-verde-oliva);
+            color: var(--color-blanco);
+            width: 55px;
+            height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .caja-contador span.numero {
+            font-size: 1.5rem;
+            font-weight: bold;
+            font-family: sans-serif;
+        }
+
+        .caja-contador span.label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+        }
+
+        /* ========================
+           PANTALLAS 4 Y 5: PERFILES
+        ======================== */
+        .perfil-bg-rosado { background-color: var(--color-rosado); }
+        .perfil-bg-oliva { background-color: var(--color-verde-oliva); }
+
+        .perfil-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 85%;
+            height: 100%;
+            justify-content: center;
+            padding-bottom: 20px;
+        }
+
+        .corona-icono {
+            width: 60px;
+            margin-bottom: 15px;
+        }
+
+        .foto-polaroid {
+            width: 100%;
+            background: #fff;
+            padding: 8px 8px 25px 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            position: relative;
+            transform: rotate(-2deg);
+        }
+
+        .foto-polaroid.reverse {
+            transform: rotate(2deg);
+        }
+
+        /* Cintas decorativas */
+        .cinta {
+            position: absolute;
+            width: 30px;
+            height: 15px;
+            background-color: rgba(255,255,255,0.7);
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+            z-index: 5;
+        }
+        
+        .cinta-tl { top: -5px; left: -10px; transform: rotate(-45deg); }
+        .cinta-br { bottom: -5px; right: -10px; transform: rotate(-45deg); }
+        .cinta-tr { top: -5px; right: -10px; transform: rotate(45deg); }
+        .cinta-bl { bottom: -5px; left: -10px; transform: rotate(45deg); }
+
+        .foto-polaroid img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+            border-radius: 2px;
+        }
+
+        .nombre-perfil {
+            font-family: var(--fuente-titulo);
+            font-size: 3.5rem;
+            color: var(--color-blanco);
+            margin: 15px 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* ========================
+           PANTALLA 6: FOTO DOBLE
+        ======================== */
+        #screen-6 {
+            background-color: var(--color-blanco);
+        }
+
+        .mitad-arriba {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 75%;
+            background-image: url('./fotos/fondo.jpg');
+            background-size: cover;
+            background-position: center center;
+            filter: grayscale(100%);
+            z-index: 1;
+        }
+
+        .franja-rosada-6 {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 25%;
+            background-color: var(--color-rosado);
+            z-index: 1;
+        }
+
+        .foto-sobrepuesta {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 85%;
+            object-fit: contain;
+            object-position: bottom center;
+            z-index: 2;
+        }
+
+        .franja-separadora-6 {
+            position: absolute;
+            top: 75%;
+            left: 0;
+            width: 100%;
+            height: 15px;
+            background-color: var(--color-dorado);
+            z-index: 1;
+            transform: translateY(-50%);
+        }
+
+        /* ========================
+           PANTALLA 7: INFO EVENTO
+        ======================== */
+        #screen-7 {
+            background-color: var(--color-verde-oliva);
+            text-align: center;
+        }
+
+        .logo-15-pequeno {
+            width: 100px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+
+        .texto-poema {
+            font-size: 1.05rem;
+            font-style: italic;
+            width: 85%;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        .fecha-bloque {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+            border-top: 1px solid rgba(255,255,255,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            padding: 10px 0;
+            width: 70%;
+        }
+
+        .info-grid {
+            display: flex;
+            width: 85%;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .info-item {
+            width: 45%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .info-item img {
+            width: 30px;
+            height: 30px;
+            margin-bottom: 10px;
+        }
+
+        .info-item h4 {
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            font-family: sans-serif;
+        }
+
+        .btn-lluvia {
+            background-color: var(--color-blanco);
+            color: var(--color-verde-oliva);
+            padding: 12px 40px;
+            border-radius: 30px;
+            display: inline-block;
+            font-family: var(--fuente-texto);
+            font-weight: bold;
+            font-style: italic;
+            text-decoration: none;
+            margin: 20px 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-size: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-lluvia::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 20%;
+            height: 200%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.8), transparent);
+            transform: rotate(30deg);
+            animation: brilloBoton 4s infinite;
+        }
+
+        @keyframes brilloBoton {
+            0% { left: -60%; }
+            20% { left: 120%; }
+            100% { left: 120%; }
+        }
+
+        .btn-lluvia img {
+            width: 20px;
+        }
+
+        .texto-final {
+            font-size: 1.1rem;
+            font-style: italic;
+            margin-bottom: 40px;
+        }
+
+        /* ========================
+           BOTÓN FLOTANTE MÚSICA
+        ======================== */
+        #btn-musica {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255,255,255,0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: none; /* Se muestra tras abrir carta */
+        }
+        
+        #btn-musica svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--color-texto-oscuro);
+        }
+
+        .rotating {
+            animation: spin 4s linear infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* KEYFRAMES */
+        @keyframes resplandorMagico { 0% { filter: drop-shadow(0 0 2px var(--color-dorado)); } 100% { filter: drop-shadow(0 0 15px var(--color-dorado)); } }
+        @keyframes pulsoSello { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
+        @keyframes toqueManito { 0% { transform: translate(5px, 5px) rotate(-10deg); } 100% { transform: translate(-5px, -5px) rotate(0deg); } }
+        @keyframes fadeInOut { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        @keyframes flotarParticula { 0% { transform: translateY(0) scale(1); opacity: 0; } 20% { opacity: 0.6; } 80% { opacity: 0.6; } 100% { transform: translateY(-100px) scale(0); opacity: 0; } }
+
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        
+        <!-- PARTICULAS MÁGICAS GLOBALES -->
+        <div id="particles-container"></div>
+        
+        <!-- PANTALLA 1: CARTA CON SELLO -->
+        <section id="screen-1" class="screen">
+            <div class="sello-container" id="btn-abrir-carta">
+                <div style="position: relative;">
+                    <img src="./sello.png" alt="Sello" class="sello-img">
+                    <img src="./iconos/manito.svg" alt="Tocar" class="manito-img">
+                </div>
+                <div class="texto-toca">
+                    Toca el sello
+                    <span>Para abrir tu invitación</span>
+                </div>
+            </div>
+        </section>
+
+        <div id="invitation-content" class="hidden-screen">
+            
+            <!-- PANTALLA 2: PORTADA -->
+            <section id="screen-2" class="screen">
+                <video id="video-fondo" src="./video/video pro.mp4" preload="auto" muted playsinline loop></video>
+
+                <div class="franja-dorada"></div>
+            </section>
+
+            <!-- PANTALLA 3: BIENVENIDA -->
+            <section id="screen-3" class="screen">
+                <div class="bienvenidos-texto anim-slide-up">Bienvenidos a</div>
+                <img src="./svg/mis 15 dorados.svg" alt="Mis 15" class="logo-15 anim-scale-in delay-1">
+                <div class="titulo-nombres anim-fade-in delay-2">Manuela &<br>Amelia</div>
+                
+                <div class="contador anim-slide-up delay-3">
+                    <div class="caja-contador"><span class="numero" id="dias">00</span><span class="label">Días</span></div>
+                    <div class="caja-contador"><span class="numero" id="horas">00</span><span class="label">Horas</span></div>
+                    <div class="caja-contador"><span class="numero" id="mins">00</span><span class="label">Minutos</span></div>
+                    <div class="caja-contador"><span class="numero" id="segs">00</span><span class="label">Segundos</span></div>
+                </div>
+
+                <div class="texto-inferior anim-fade-in delay-4">
+                    "Para familiares y amigos que<br>han acompañado la vida<br>de estas princesas"
+                </div>
+                <div class="franja-dorada"></div>
+            </section>
+
+            <!-- PANTALLA 4: AMELIA -->
+            <section id="screen-4" class="screen perfil-bg-rosado">
+                <div class="perfil-content">
+                    <img src="./svg/corona blanca.svg" class="corona-icono anim-fade-in">
+                    
+                    <div class="foto-polaroid anim-scale-in delay-1">
+                        <div class="cinta cinta-tl"></div>
+                        <div class="cinta cinta-br"></div>
+                        <img src="./slider/foto amelia arriba a.png" alt="Amelia 1">
+                    </div>
+
+                    <div class="nombre-perfil anim-slide-up delay-2">Amelia Roberson</div>
+
+                    <div class="foto-polaroid reverse anim-scale-in delay-3">
+                        <div class="cinta cinta-tr"></div>
+                        <div class="cinta cinta-bl"></div>
+                        <!-- Ajuste de nombre de archivo con espacio al final según list_dir -->
+                        <img src="./slider/foto amelia abajo b .png" alt="Amelia 2">
+                    </div>
+                </div>
+            </section>
+
+            <!-- PANTALLA 5: MANUELA -->
+            <section id="screen-5" class="screen perfil-bg-oliva">
+                <div class="perfil-content">
+                    <img src="./svg/corona blanca.svg" class="corona-icono anim-fade-in">
+                    
+                    <div class="foto-polaroid anim-scale-in delay-1">
+                        <div class="cinta cinta-tl"></div>
+                        <div class="cinta cinta-br"></div>
+                        <img src="./slider/foto manuela arriba c.png" alt="Manuela 1">
+                    </div>
+
+                    <div class="nombre-perfil anim-slide-up delay-2">Manuela Cordero</div>
+
+                    <div class="foto-polaroid reverse anim-scale-in delay-3">
+                        <div class="cinta cinta-tr"></div>
+                        <div class="cinta cinta-bl"></div>
+                        <!-- Asumiendo que la D es la de abajo -->
+                        <img src="./slider/foto manuela arriba d.png" alt="Manuela 2">
+                    </div>
+                </div>
+            </section>
+
+            <!-- PANTALLA 6: FOTO DOBLE -->
+            <section id="screen-6" class="screen">
+                <div class="mitad-arriba anim-fade-in"></div>
+                <div class="franja-separadora-6"></div>
+                <div class="franja-rosada-6"></div>
+                <!-- Asegurar proporción correcta para que no se deforme -->
+                <img src="./fotos/las dos ninas.png" class="foto-sobrepuesta anim-slide-up delay-1" alt="Manuela y Amelia">
+            </section>
+
+            <!-- PANTALLA 7: INFO EVENTO -->
+            <section id="screen-7" class="screen">
+                <img src="./svg/mis 15 blancos.svg" alt="Mis 15" class="logo-15-pequeno anim-scale-in">
+                
+                <div class="texto-poema anim-fade-in delay-1">
+                    Como dos mariposas en flor, florece su<br>
+                    encanto. Que la vida les regale<br>
+                    momentos tiernos y que en cada paso<br>
+                    encuentren alegría, luz y felicidad.
+                </div>
+
+                <div class="fecha-bloque anim-slide-up delay-2">
+                    Sábado | 6 | Junio
+                </div>
+
+                <div class="info-grid anim-fade-in delay-3">
+                    <div class="info-item">
+                        <h4>LUGAR</h4>
+                        <img src="./iconos/lugar.svg" alt="Ubicación">
+                        Carrera 18 #8-24<br>Barrio Pueblo Nuevo
+                    </div>
+                    <div class="info-item">
+                        <h4>HORA</h4>
+                        <img src="./iconos/hora.svg" alt="Reloj">
+                        8:00 p.m.
+                    </div>
+                </div>
+
+                <a href="#" class="btn-lluvia anim-scale-in delay-4">
+                    Lluvia de sobres
+                </a>
+
+                <div class="texto-final anim-slide-up delay-4">
+                    Tu presencia es lo más<br>importante. ¡No faltes!
+                </div>
+
+
+            </section>
+
+        </div>
+    </div>
+
+    <!-- MÚSICA Y BOTÓN FLOTANTE -->
+    <audio id="musica-fondo" src="./musica/musica.mp3" preload="auto" loop></audio>
+    <div id="btn-musica">
+        <!-- Icono de Nota Musical (Play) -->
+        <svg id="icon-musica" viewBox="0 0 24 24" class="rotating">
+            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+        </svg>
+    </div>
+
+    <script>
+        // ========================
+        // PRECARGA DE RECURSOS
+        // ========================
+        const imagesToPreload = [
+            './sello.png',
+            './iconos/manito.svg',
+            './fotos/fondo.jpg',
+            './fotos/las dos ninas.png',
+            './slider/foto amelia arriba a.png',
+            './slider/foto amelia abajo b .png',
+            './slider/foto manuela arriba c.png',
+            './slider/foto manuela arriba d.png',
+            './svg/corona blanca.svg',
+            './svg/mis 15 blancos.svg',
+            './svg/mis 15 dorados.svg',
+            './iconos/hora.svg',
+            './iconos/lugar.svg',
+            './iconos/lluvia de sobres.svg'
+        ];
+
+        imagesToPreload.forEach(src => {
+            const img = new Image();
+            img.src = src;
+        });
+
+        // ========================
+        // PARTICULAS INICIO
+        // ========================
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            if(!container) return;
+            for(let i=0; i<30; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                const size = Math.random() * 5 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                particle.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                particle.style.animationDelay = `${Math.random() * 2}s`;
+                
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        // ========================
+        // LOGICA AUDIO Y BOTÓN
+        // ========================
+        const musica = document.getElementById('musica-fondo');
+        const btnMusica = document.getElementById('btn-musica');
+        const iconMusica = document.getElementById('icon-musica');
+        let isPlaying = false;
+
+        function toggleMusic() {
+            if(isPlaying) {
+                // Fade out
+                let fadeOut = setInterval(() => {
+                    if (musica.volume > 0.1) {
+                        musica.volume -= 0.1;
+                    } else {
+                        musica.pause();
+                        musica.volume = 1;
+                        clearInterval(fadeOut);
+                    }
+                }, 50);
+                iconMusica.classList.remove('rotating');
+                isPlaying = false;
+            } else {
+                musica.volume = 0;
+                musica.play().catch(e => console.log(e));
+                // Fade in
+                let fadeIn = setInterval(() => {
+                    if (musica.volume < 0.9) {
+                        musica.volume += 0.05;
+                    } else {
+                        musica.volume = 1;
+                        clearInterval(fadeIn);
+                    }
+                }, 100);
+                iconMusica.classList.add('rotating');
+                isPlaying = true;
+            }
+        }
+
+        btnMusica.addEventListener('click', toggleMusic);
+
+        // ========================
+        // ABRIR CARTA Y VIDEO
+        // ========================
+        const btnAbrirCarta = document.getElementById('btn-abrir-carta');
+        const screen1 = document.getElementById('screen-1');
+        const invitationContent = document.getElementById('invitation-content');
+        const videoFondo = document.getElementById('video-fondo');
+
+        btnAbrirCarta.addEventListener('click', () => {
+            screen1.classList.add('carta-abierta');
+            invitationContent.classList.remove('hidden-screen');
+            
+            // Iniciar música
+            toggleMusic();
+            btnMusica.style.display = 'flex';
+
+            // Iniciar video portada (como workaround para iOS, debe ser llamado en un tap)
+            videoFondo.play().catch(e => console.log('Video autoplay fail:', e));
+
+            setTimeout(() => {
+                screen1.style.display = 'none';
+            }, 1500);
+        });
+
+        // ========================
+        // CONTADOR REGRESIVO
+        // ========================
+        // Fecha objetivo: 6 de junio de 2026, 8:00 p.m.
+        const countDownDate = new Date("Jun 6, 2026 20:00:00").getTime();
+
+        const x = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = countDownDate - now;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("dias").innerHTML = days < 10 ? '0' + days : days;
+            document.getElementById("horas").innerHTML = hours < 10 ? '0' + hours : hours;
+            document.getElementById("mins").innerHTML = minutes < 10 ? '0' + minutes : minutes;
+            document.getElementById("segs").innerHTML = seconds < 10 ? '0' + seconds : seconds;
+
+            if (distance < 0) {
+                clearInterval(x);
+                document.getElementById("dias").innerHTML = "00";
+                document.getElementById("horas").innerHTML = "00";
+                document.getElementById("mins").innerHTML = "00";
+                document.getElementById("segs").innerHTML = "00";
+            }
+        }, 1000);
+
+        // ========================
+        // INTERSECTION OBSERVER
+        // ========================
+        // Añade la clase 'is-visible' a las pantallas cuando entran en el viewport para animar
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    
+                    // Asegurar que si volvemos a la pantalla 2, el video corra
+                    if(entry.target.id === 'screen-2' && videoFondo.paused) {
+                        videoFondo.play().catch(e=>{});
+                    }
+                } else {
+                    entry.target.classList.remove('is-visible');
+                    // Opcional: pausar video si no se ve para ahorrar recursos
+                    if(entry.target.id === 'screen-2' && !videoFondo.paused) {
+                        // videoFondo.pause();
+                    }
+                }
+            });
+        }, {
+            threshold: 0.3 // Dispara cuando el 30% de la pantalla es visible
+        });
+
+        document.querySelectorAll('.screen').forEach((screen) => {
+            observer.observe(screen);
+        });
+
+    </script>
+</body>
+</html>
