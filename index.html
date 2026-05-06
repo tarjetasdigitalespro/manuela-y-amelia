@@ -437,23 +437,23 @@
         }
 
         .logo-15-pequeno {
-            width: 100px;
-            margin-top: 40px;
+            width: 140px;
+            margin-top: 25px;
             margin-bottom: 20px;
         }
 
         .texto-poema {
-            font-size: 1.05rem;
+            font-size: 1rem;
             font-style: italic;
-            width: 85%;
-            margin-bottom: 25px;
-            line-height: 1.4;
+            width: 90%;
+            margin-bottom: 15px;
+            line-height: 1.3;
         }
 
         .fecha-bloque {
             font-size: 1.1rem;
             font-weight: bold;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
             letter-spacing: 1px;
             border-top: 1px solid rgba(255,255,255,0.3);
             border-bottom: 1px solid rgba(255,255,255,0.3);
@@ -462,24 +462,28 @@
         }
 
         .info-grid {
-            display: flex;
-            width: 85%;
-            justify-content: space-between;
-            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            align-items: start;
+            text-align: center;
+            gap: 5px;
+            width: 95%;
+            margin-bottom: 20px;
         }
 
         .info-item {
-            width: 45%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            line-height: 1.2;
         }
 
         .info-item img {
-            width: 30px;
-            height: 30px;
-            margin-bottom: 10px;
+            width: 35px;
+            height: 35px;
+            margin-bottom: 8px;
+            object-fit: contain;
         }
 
         .info-item h4 {
@@ -499,7 +503,7 @@
             font-weight: bold;
             font-style: italic;
             text-decoration: none;
-            margin: 20px 0;
+            margin: 10px 0;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             font-size: 1.2rem;
             position: relative;
@@ -531,7 +535,7 @@
         .texto-final {
             font-size: 1.1rem;
             font-style: italic;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
         }
 
         /* ========================
@@ -572,6 +576,49 @@
         @keyframes toqueManito { 0% { transform: translate(5px, 5px) rotate(-10deg); } 100% { transform: translate(-5px, -5px) rotate(0deg); } }
         @keyframes fadeInOut { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
         @keyframes flotarParticula { 0% { transform: translateY(0) scale(1); opacity: 0; } 20% { opacity: 0.6; } 80% { opacity: 0.6; } 100% { transform: translateY(-100px) scale(0); opacity: 0; } }
+
+        /* ========================
+           BOTÓN WHATSAPP INTEGRADO
+        ======================== */
+        #btn-whatsapp {
+            background-color: #d81b60; /* Rosa vibrante */
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            font-weight: bold;
+            font-family: var(--fuente-texto);
+            animation: pulse-pink 2s infinite;
+            border: 2px solid white;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        #btn-whatsapp span {
+            font-size: 1.1rem;
+            text-transform: none;
+            letter-spacing: 0.5px;
+        }
+
+        #btn-whatsapp .manito-wa {
+            width: 35px;
+            position: absolute;
+            right: -20px;
+            top: -10px;
+            animation: toqueManito 0.8s infinite alternate ease-in-out;
+            pointer-events: none;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        @keyframes pulse-pink {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
 
     </style>
 </head>
@@ -703,10 +750,20 @@
                         <img src="./iconos/hora.svg" alt="Reloj">
                         8:00 p.m.
                     </div>
+                    <div class="info-item">
+                        <h4>MISA</h4>
+                        <img src="./iconos/iglesia.svg" alt="Iglesia">
+                        Iglesia Sagrado<br>Corazón de Jesús<br>Barrio la Ye<br>Hora 7 p.m. 6 de junio
+                    </div>
                 </div>
 
                 <a href="#" class="btn-lluvia anim-scale-in delay-4">
                     Lluvia de sobres
+                </a>
+
+                <a href="https://wa.link/7nyg9d" id="btn-whatsapp" class="anim-scale-in delay-4" target="_blank">
+                    <span>Confirmar asistencia</span>
+                    <img src="./iconos/manito.svg" alt="Confirmar" class="manito-wa">
                 </a>
 
                 <div class="texto-final anim-slide-up delay-4">
